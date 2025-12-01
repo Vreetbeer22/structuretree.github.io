@@ -48,13 +48,13 @@
   {
     "name": "D_folder = 1",
     "parents": [
+      "D_folder",
       "D_root",
-      "Document Types",
-      "Folder"
+      "Document Types"
     ],
     "children": [
-      "D_part",
-      "Folder"
+      "D_folder",
+      "D_part"
     ]
   },
   {
@@ -87,9 +87,12 @@
       "Representation Elements"
     ],
     "children": [
+      "B_sheet",
       "B_solid",
       "Dimension",
+      "M_hatch",
       "Material",
+      "Solid",
       "Text"
     ]
   },
@@ -100,7 +103,10 @@
       "Representation Elements"
     ],
     "children": [
-      "P_polygon"
+      "F_polygon",
+      "P_polygon",
+      "P_polyline",
+      "Wire"
     ]
   },
   {
@@ -195,8 +201,10 @@
   {
     "name": "shell = 13",
     "parents": [
+      "B_sheet",
       "B_solid",
-      "Body Elements"
+      "Body Elements",
+      "Solid"
     ],
     "children": [
       "Face Elements"
@@ -206,14 +214,16 @@
     "name": "wire = 14",
     "parents": [
       "Body Elements",
-      "F_plane",
-      "F_symbol",
+      "Face Elements",
       "P_polygon",
+      "P_polyline",
+      "R_2Drep",
       "R_Poly",
       "Text"
     ],
     "children": [
       "Curve Elements",
+      "F_symbol",
       "Text(Explain or remove and make it child of face)"
     ]
   },
@@ -246,48 +256,6 @@
     "name": "F_bspline = 16",
     "parents": [
       "Face Elements",
-      "R_Brep"
-    ],
-    "children": []
-  },
-  {
-    "name": "F_cone = 17",
-    "parents": [
-      "Face Elements",
-      "R_Brep"
-    ],
-    "children": []
-  },
-  {
-    "name": "F_cilinder = 18",
-    "parents": [
-      "Face Elements",
-      "R_Brep"
-    ],
-    "children": []
-  },
-  {
-    "name": "F_extrusion = 19",
-    "parents": [
-      "Face Elements",
-      "R_Brep"
-    ],
-    "children": []
-  },
-  {
-    "name": "F_offset = 20",
-    "parents": [
-      "Face Elements",
-      "R_Brep"
-    ],
-    "children": []
-  },
-  {
-    "name": "F_plane = 21",
-    "parents": [
-      "Face Elements",
-      "M_hatch",
-      "R_2Drep",
       "Shell"
     ],
     "children": [
@@ -295,43 +263,106 @@
     ]
   },
   {
+    "name": "F_cone = 17",
+    "parents": [
+      "Face Elements",
+      "Shell"
+    ],
+    "children": [
+      "Wire"
+    ]
+  },
+  {
+    "name": "F_cilinder = 18",
+    "parents": [
+      "Face Elements",
+      "Shell"
+    ],
+    "children": [
+      "Wire"
+    ]
+  },
+  {
+    "name": "F_extrusion = 19",
+    "parents": [
+      "Face Elements",
+      "Shell"
+    ],
+    "children": [
+      "Wire"
+    ]
+  },
+  {
+    "name": "F_offset = 20",
+    "parents": [
+      "Face Elements",
+      "Shell"
+    ],
+    "children": [
+      "Wire"
+    ]
+  },
+  {
+    "name": "F_plane = 21",
+    "parents": [
+      "Face Elements",
+      "M_hatch",
+      "P_polyline",
+      "R_2Drep",
+      "Shell",
+      "Solid"
+    ],
+    "children": [
+      "F_polygon",
+      "Wire"
+    ]
+  },
+  {
     "name": "F_revolution = 22",
     "parents": [
       "Face Elements",
-      "R_Brep"
+      "Shell"
     ],
-    "children": []
+    "children": [
+      "Wire"
+    ]
   },
   {
     "name": "F_sphere = 23",
     "parents": [
       "Face Elements",
-      "R_Brep"
+      "Shell"
     ],
-    "children": []
+    "children": [
+      "Wire"
+    ]
   },
   {
     "name": "F_toroid = 24",
     "parents": [
       "Face Elements",
-      "R_Brep"
+      "Shell"
     ],
-    "children": []
+    "children": [
+      "Wire"
+    ]
   },
   {
     "name": "F_trimmed = 25",
     "parents": [
       "Face Elements",
-      "R_Brep"
+      "Shell"
     ],
-    "children": []
+    "children": [
+      "Wire"
+    ]
   },
   {
     "name": "F_symbol = 2",
     "parents": [
       "Face Elements",
       "R_2Drep",
-      "R_Brep",
+      "Shell",
       "Text",
       "Wire"
     ],
@@ -363,10 +394,11 @@
     "name": "P_polygon = 26",
     "parents": [
       "Poly Elements",
-      "R_Poly?"
+      "R_Poly"
     ],
     "children": [
-      "Material"
+      "Material",
+      "Wire"
     ]
   },
   {
@@ -393,7 +425,7 @@
     ]
   },
   {
-    "name": "P_points = 29 (Leave out for now)",
+    "name": "P_points = 29 (Leave out for now) (Still in use for the point so maybe just change it)",
     "parents": [
       "Poly Elements",
       "R_2Drep"
@@ -415,7 +447,7 @@
     "parents": [],
     "children": [
       "F_polygon = 28",
-      "P_points = 29 (Leave out for now)",
+      "P_points = 29 (Leave out for now) (Still in use for the point so maybe just change it)",
       "P_polygon = 26",
       "P_polyline = 27",
       "P_vertex = 30 (Leave out for now)"
@@ -454,7 +486,8 @@
       "Wire"
     ],
     "children": [
-      "M_patternLine"
+      "M_patternLine",
+      "Material"
     ]
   },
   {
@@ -465,7 +498,8 @@
       "Wire"
     ],
     "children": [
-      "M_patternLine"
+      "M_patternLine",
+      "Material"
     ]
   },
   {
@@ -722,8 +756,12 @@
   {
     "name": "Material = 57",
     "parents": [
+      "B_solid",
+      "C_bezier",
+      "C_bspline",
       "D_part",
       "F_symbol",
+      "P_polygon",
       "R_brep",
       "Texture Types"
     ],
