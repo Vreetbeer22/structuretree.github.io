@@ -42,7 +42,8 @@
     ],
     "children": [
       "D_folder",
-      "D_part"
+      "D_part",
+      "Gim_Joint"
     ]
   },
   {
@@ -62,9 +63,12 @@
     "parents": [
       "D_folder",
       "D_root",
-      "Document Types"
+      "Document Types",
+      "Gim_Boolean"
     ],
     "children": [
+      "ExternalReference",
+      "Gim_Boolean",
       "Material",
       "R_2Drep",
       "R_Brep",
@@ -90,9 +94,8 @@
       "B_sheet",
       "B_solid",
       "Dimension",
-      "M_hatch",
+      "M_hatch????",
       "Material",
-      "Solid",
       "Text"
     ]
   },
@@ -103,24 +106,16 @@
       "Representation Elements"
     ],
     "children": [
-      "F_polygon",
-      "P_polygon",
-      "P_polyline",
-      "Wire"
+      "P_polygon& P_polyline ???"
     ]
   },
   {
-    "name": "R_2Drep = ?",
+    "name": "R_2Drep = 6",
     "parents": [
       "D_part",
       "Representation Elements"
     ],
     "children": [
-      "C_bezier2D",
-      "C_bspline2D",
-      "C_circle2D",
-      "C_ellipse2D",
-      "C_line2D",
       "Dimension",
       "F_plane",
       "F_symbol",
@@ -133,24 +128,10 @@
     "name": "Representation Elements",
     "parents": [],
     "children": [
-      "R_2Drep = ?",
+      "R_2Drep = 6",
       "R_Brep = 4",
       "R_Poly = 5"
     ]
-  },
-  {
-    "name": "B_acorn = 6",
-    "parents": [
-      "Body Elements"
-    ],
-    "children": []
-  },
-  {
-    "name": "B_general = 7",
-    "parents": [
-      "Body Elements"
-    ],
-    "children": []
   },
   {
     "name": "B_sheet = 8",
@@ -174,37 +155,18 @@
     ]
   },
   {
-    "name": "undefined = 10",
+    "name": "undefined =10",
     "parents": [
       "Body Elements"
     ],
     "children": []
-  },
-  {
-    "name": "B_wireframe = 11",
-    "parents": [
-      "Body Elements"
-    ],
-    "children": []
-  },
-  {
-    "name": "solid = 12",
-    "parents": [
-      "Body Elements",
-      "R_Brep"
-    ],
-    "children": [
-      "F_plane",
-      "Shell"
-    ]
   },
   {
     "name": "shell = 13",
     "parents": [
       "B_sheet",
       "B_solid",
-      "Body Elements",
-      "Solid"
+      "Body Elements"
     ],
     "children": [
       "Face Elements"
@@ -215,30 +177,23 @@
     "parents": [
       "Body Elements",
       "Face Elements",
-      "P_polygon",
-      "P_polyline",
       "R_2Drep",
-      "R_Poly",
       "Text"
     ],
     "children": [
       "Curve Elements",
       "F_symbol",
-      "Text(Explain or remove and make it child of face)"
+      "Text(Explain or remove and make it child of face) maybe child of curve"
     ]
   },
   {
     "name": "Body Elements",
     "parents": [],
     "children": [
-      "B_acorn = 6",
-      "B_general = 7",
       "B_sheet = 8",
       "B_solid = 9",
-      "B_wireframe = 11",
       "shell = 13",
-      "solid = 12",
-      "undefined = 10",
+      "undefined =10",
       "wire = 14"
     ]
   },
@@ -246,10 +201,10 @@
     "name": "F_bezier = 15",
     "parents": [
       "Face Elements",
-      "Shell(replace in all)"
+      "Shell"
     ],
     "children": [
-      "Wire(replace in all)"
+      "Wire"
     ]
   },
   {
@@ -306,14 +261,12 @@
     "name": "F_plane = 21",
     "parents": [
       "Face Elements",
-      "M_hatch",
-      "P_polyline",
       "R_2Drep",
-      "Shell",
-      "Solid"
+      "Shell"
     ],
     "children": [
-      "F_polygon",
+      "M_hatch",
+      "Material???",
       "Wire"
     ]
   },
@@ -358,7 +311,7 @@
     ]
   },
   {
-    "name": "F_symbol = 2",
+    "name": "F_symbol = 28",
     "parents": [
       "Face Elements",
       "R_2Drep",
@@ -367,7 +320,7 @@
       "Wire"
     ],
     "children": [
-      "Material?",
+      "Material",
       "Text",
       "Wire"
     ]
@@ -385,7 +338,7 @@
       "F_plane = 21",
       "F_revolution = 22",
       "F_sphere = 23",
-      "F_symbol = 2",
+      "F_symbol = 28",
       "F_toroid = 24",
       "F_trimmed = 25"
     ]
@@ -397,8 +350,7 @@
       "R_Poly"
     ],
     "children": [
-      "Material",
-      "Wire"
+      "Material"
     ]
   },
   {
@@ -413,30 +365,10 @@
     ]
   },
   {
-    "name": "F_polygon = 28",
-    "parents": [
-      "F_plane",
-      "Poly Elements",
-      "R_Poly"
-    ],
-    "children": [
-      "C_circle",
-      "C_line"
-    ]
-  },
-  {
-    "name": "P_points = 29 (Leave out for now) (Still in use for the point so maybe just change it)",
+    "name": "P_vertex = 30",
     "parents": [
       "Poly Elements",
-      "R_2Drep"
-    ],
-    "children": []
-  },
-  {
-    "name": "P_vertex = 30 (Leave out for now)",
-    "parents": [
-      "Poly Elements",
-      "R_Brep"
+      "R_Brep& more"
     ],
     "children": [
       "material"
@@ -446,18 +378,15 @@
     "name": "Poly Elements",
     "parents": [],
     "children": [
-      "F_polygon = 28",
-      "P_points = 29 (Leave out for now) (Still in use for the point so maybe just change it)",
       "P_polygon = 26",
       "P_polyline = 27",
-      "P_vertex = 30 (Leave out for now)"
+      "P_vertex = 30"
     ]
   },
   {
     "name": "C_bezier = 31",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -469,7 +398,6 @@
     "name": "C_bspline = 32",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -481,8 +409,6 @@
     "name": "C_circle = 33",
     "parents": [
       "Curve Elements",
-      "F_polygon",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -494,7 +420,6 @@
     "name": "C_elipse = 34",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -506,7 +431,6 @@
     "name": "C_hyperbol = 35",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -518,8 +442,6 @@
     "name": "C_line = 36",
     "parents": [
       "Curve Elements",
-      "F_polygon",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -531,7 +453,6 @@
     "name": "C_parabol = 37",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -543,7 +464,6 @@
     "name": "C_offset = 38",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -555,10 +475,10 @@
     "name": "C_trimmed = 39",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
+      "Curve",
       "M_patternLine",
       "Material"
     ]
@@ -567,8 +487,7 @@
     "name": "C_bezier2D = 40",
     "parents": [
       "Curve Elements",
-      "R_2Drep",
-      "R_Brep",
+      "R_2Drep???",
       "Wire"
     ],
     "children": [
@@ -580,8 +499,7 @@
     "name": "C_bspline2D = 41",
     "parents": [
       "Curve Elements",
-      "R_2Drep",
-      "R_Brep",
+      "R_2Drep???",
       "Wire"
     ],
     "children": [
@@ -593,8 +511,7 @@
     "name": "C_circle2D = 42",
     "parents": [
       "Curve Elements",
-      "R_2Drep",
-      "R_Brep",
+      "R_2Drep???",
       "Wire"
     ],
     "children": [
@@ -606,8 +523,7 @@
     "name": "C_elipse2D = 43",
     "parents": [
       "Curve Elements",
-      "R_2Drep",
-      "R_Brep",
+      "R_2Drep???",
       "Wire"
     ],
     "children": [
@@ -619,7 +535,6 @@
     "name": "C_hyperbol2D = 44",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -631,10 +546,8 @@
     "name": "C_line2D = 45",
     "parents": [
       "Curve Elements",
-      "R_2Drep",
-      "R_Brep",
-      "Wire",
-      "polygon?"
+      "R_2Drep???",
+      "Wire"
     ],
     "children": [
       "M_patternLine",
@@ -645,7 +558,6 @@
     "name": "C_parabol2D = 46",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -657,7 +569,6 @@
     "name": "C_offset2D = 47",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
@@ -669,20 +580,12 @@
     "name": "C_trimmed2D = 48",
     "parents": [
       "Curve Elements",
-      "R_Brep",
       "Wire"
     ],
     "children": [
       "M_patternLine",
       "Material"
     ]
-  },
-  {
-    "name": "M_PatternLine = 63",
-    "parents": [
-      "Curve Elements"
-    ],
-    "children": []
   },
   {
     "name": "Curve Elements",
@@ -708,7 +611,7 @@
       "C_parabol2D = 46",
       "C_trimmed = 39",
       "C_trimmed2D = 48",
-      "M_PatternLine = 63"
+      "M_patternLine"
     ]
   },
   {
@@ -728,19 +631,19 @@
   {
     "name": "Gim_Joint = 55",
     "parents": [
-      "Gim Elements",
-      "Root"
+      "D_root",
+      "Gim Elements"
     ],
     "children": []
   },
   {
     "name": "Gim_Boolean = 56",
     "parents": [
-      "Gim Elements",
-      "Part"
+      "D_part",
+      "Gim Elements"
     ],
     "children": [
-      "Part"
+      "D_part"
     ]
   },
   {
@@ -770,6 +673,14 @@
     ]
   },
   {
+    "name": "PatternLine = 63",
+    "parents": [
+      "Curve Elements",
+      "Texture Types"
+    ],
+    "children": []
+  },
+  {
     "name": "Texture = 58",
     "parents": [
       "Material",
@@ -780,7 +691,7 @@
   {
     "name": "ExternalReference = 59",
     "parents": [
-      "Part",
+      "D_part",
       "Texture Types"
     ],
     "children": []
@@ -791,6 +702,7 @@
     "children": [
       "ExternalReference = 59",
       "Material = 57",
+      "PatternLine = 63",
       "Texture = 58"
     ]
   },
@@ -810,14 +722,13 @@
     ]
   },
   {
-    "name": "M_hatch = 62",
+    "name": "Hatch = 62",
     "parents": [
       "Extra types",
-      "R_Brep"
+      "F_plane"
     ],
     "children": [
-      "Curve Elements",
-      "F_plane"
+      "Curve Elements"
     ]
   },
   {
@@ -844,7 +755,7 @@
     "parents": [],
     "children": [
       "Dimension = 51",
-      "M_hatch = 62",
+      "Hatch = 62",
       "Text = 61",
       "Viewport = 50"
     ]
