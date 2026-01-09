@@ -2,29 +2,44 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Confluence Structure Tree</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 
 <body>
-  <div id="controls">
-    <button id="collapseAll">Collapse all</button>
-    <button id="expandAll">Expend all</button>
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div class="toolbar-left">
+      <button id="collapseAll">Collapse all</button>
+      <button id="expandAll">Expand all</button>
+
+      <input type="text" id="searchInput" placeholder="search" />
+      <button id="searchButton">🔍</button>
+
+      <button id="prevButton">Previous</button>
+      <button id="nextButton">Next</button>
+      <button id="resetTree">Reset</button>
+
+      <span id="resultCount"></span>
+    </div>
   </div>
 
-  <div id="search-controls">
-    <input type="text" id="searchInput" placeholder="search">
-    <button id="searchButton">Search</button>
-    <button id="nextButton">Next</button>
-    <button id="prevButton">Previous</button>
-    <button id="resetTree">Reset</button>
-    <span id="resultCount"></span>
-  </div>
+  <!-- Tree area -->
+  <div id="tree-wrapper">
+    <!-- Info overlay -->
+    <div id="info">
+      <div class="info-item gray">Cant Expand</div>
+      <div class="info-item red">Can expand but higher up</div>
+      <div class="info-item blue">Can expand</div>
+    </div>
 
-  <div id="tree-container"></div>
+    <!-- D3 tree renders here -->
+    <div id="tree-container"></div>
+  </div>
 
   <script src="tree.js"></script>
 </body>

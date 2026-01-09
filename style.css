@@ -1,72 +1,114 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  padding: 0;
   font-family: Arial, sans-serif;
   background: #ffffff;
 }
 
-#controls {
-  background: #f8f8f8;
+/* ───────── Toolbar ───────── */
+
+#toolbar {
+  background: #ffffff;
   padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  border-bottom: 1px solid #707072;
 }
 
-#search-controls {
-  background: #f8f8f8;
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
+.toolbar-left {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
 button {
-  padding: 4px 12px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  padding: 6px 14px;
+  border-radius: 18px;
+  border: 1px solid #707072;
   background: #ffffff;
   color: #333;
   cursor: pointer;
   font-size: 13px;
-  font-family: Arial, sans-serif;
-  transition: background 0.2s;
 }
 
 button:hover {
   background: #f0f0f0;
-  border-color: #999;
 }
 
-button:active {
-  background: #e0e0e0;
-}
-
-#searchInput {
-  padding: 4px 8px;
+input[type="text"] {
+  padding: 6px 10px;
+  border-radius: 18px;
   border: 1px solid #ccc;
-  border-radius: 3px;
   font-size: 13px;
-  font-family: Arial, sans-serif;
-  min-width: 150px;
-}
-
-#searchInput:focus {
-  outline: none;
-  border-color: #4a90e2;
+  width: 150px;
 }
 
 #resultCount {
-  color: #666;
-  font-size: 13px;
   margin-left: 8px;
+  font-size: 13px;
+  color: #666;
 }
 
-#tree-container {
-  background: white;
-  height: calc(100vh - 90px);
-  overflow: hidden;
+/* ───────── Tree wrapper ───────── */
+
+#tree-wrapper {
   position: relative;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+/* ───────── info (overlay) ───────── */
+
+#info {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  width: 220px;
+  padding: 16px;
+
+  background: #ffffff;
+  border: 1px solid #707072;
+  border-radius: 8px;
+
+  height: fit-content;
+  z-index: 10;
+}
+
+/* info items */
+
+.info-item {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  border: 1px solid #707072;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-item.gray {
+  background: #BEC0C1;
+}
+
+.info-item.red {
+  background: #FFB3B3;
+  border-color: #DA4646;
+}
+
+.info-item.blue {
+  background: #B3D9FF;
+  border-color: #0043B6;
+}
+
+/* ───────── Tree container ───────── */
+
+#tree-container {
+  width: 100%;
+  height: 100%;
 }

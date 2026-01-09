@@ -138,7 +138,6 @@ function buildTreeFromNode(targetNode) {
           const parent = nodesMap[normalizeName(parentName)];
           if (!parent) return null;
           const parentTree = buildParentTree(parent, depth + 1, newVisited);
-          parentTree.isParent = true;
           return parentTree;
         })
         .filter(Boolean);
@@ -179,7 +178,6 @@ function buildTreeFromNode(targetNode) {
           const child = nodesMap[normalizeName(childName)];
           if (!child) return null;
           const childTree = buildChildTree(child, depth + 1, newVisited);
-          childTree.isChild = true;
           return childTree;
         })
         .filter(Boolean);
@@ -310,8 +308,8 @@ function renderTree(treeData) {
       root._children = null;
     }
   } else {
-    // For normal tree: expand 3 levels
-    expandLevels(root, 0, 3);
+    // FIX 1: For normal tree: expand only 2 levels (was 3)
+    expandLevels(root, 0, 2);
   }
 
   update(root);
@@ -320,6 +318,39 @@ function renderTree(treeData) {
   function update(source) {
     // Calculate new tree layout
     treeLayout(root);
+    
+    // FIX 2: Properly propagate parent/child markers through the tree
+    function propagateMarkers(node) {
+      if (node.children) {
+        node.children.forEach(child => {
+          // Inherit parent/child status from parent node
+          if (node.data.isParent && !child.data.isChild && !child.data.isTarget) {
+            child.data.isParent = true;
+          }
+          if (node.data.isChild && !child.data.isParent && !child.data.isTarget) {
+            child.data.isChild = true;
+          }
+          propagateMarkers(child);
+        });
+      }
+      if (node._children) {
+        node._children.forEach(child => {
+          // Inherit parent/child status from parent node
+          if (node.data.isParent && !child.data.isChild && !child.data.isTarget) {
+            child.data.isParent = true;
+          }
+          if (node.data.isChild && !child.data.isParent && !child.data.isTarget) {
+            child.data.isChild = true;
+          }
+          propagateMarkers(child);
+        });
+      }
+    }
+    
+    // Apply marker propagation in search mode
+    if (isSearchTree) {
+      propagateMarkers(root);
+    }
     
     // Adjust Y positions for butterfly layout in search mode
     if (isSearchTree) {
