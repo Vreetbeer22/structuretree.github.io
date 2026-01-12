@@ -269,13 +269,22 @@ function renderTree(treeData) {
   // Node dimensions
   const rectHeight = 30;
   const rectPadding = 10;
+  
+  // Check if this is a search tree to determine layout
+  const isSearchTree = treeData.isTarget || 
+    (treeData.children && treeData.children.some(c => c.isTarget || c.isParent || c.isChild));
+  
   const treeLayout = d3.tree().nodeSize([180, 70]);
+  
   root = d3.hierarchy(treeData);
 
   // Store node positions for smooth transitions
+  let nodeIdCounter = 0;
   root.descendants().forEach((d) => {
     d.x0 = d.x;
     d.y0 = d.y;
+    // Assign permanent IDs based on node path
+    d.id = d.data.name + '_' + (d.parent ? d.parent.id : 'root');
   });
 
   // Initially collapse all nodes
@@ -297,18 +306,17 @@ function renderTree(treeData) {
     }
   }
   
-  // Check if this is a search tree (has isTarget marker)
-  const isSearchTree = root.data.isTarget || 
-    (root.children && root.children.some(c => c.data.isTarget));
+  // Store whether this is a search tree for later use
+  const isSearchTreeView = isSearchTree;
   
-  if (isSearchTree) {
+  if (isSearchTreeView) {
     // For search: only expand first level (direct connections)
     if (root._children) {
       root.children = root._children;
       root._children = null;
     }
   } else {
-    // FIX 1: For normal tree: expand only 2 levels (was 3)
+    // For normal tree: expand only 2 levels
     expandLevels(root, 0, 2);
   }
 
@@ -319,7 +327,7 @@ function renderTree(treeData) {
     // Calculate new tree layout
     treeLayout(root);
     
-    // FIX 2: Properly propagate parent/child markers through the tree
+    // Properly propagate parent/child markers through the tree
     function propagateMarkers(node) {
       if (node.children) {
         node.children.forEach(child => {
@@ -348,12 +356,13 @@ function renderTree(treeData) {
     }
     
     // Apply marker propagation in search mode
-    if (isSearchTree) {
+    if (isSearchTreeView) {
       propagateMarkers(root);
     }
     
-    // Adjust Y positions for butterfly layout in search mode
-    if (isSearchTree) {
+    // Adjust positions for butterfly layout in search mode
+    if (isSearchTreeView) {
+      // First set Y positions (up/down)
       root.descendants().forEach((d) => {
         if (d.data.isParent) {
           // Parents go UP (negative Y)
@@ -364,23 +373,57 @@ function renderTree(treeData) {
         }
         // Target stays at y=0
       });
+      
+      // Then completely override X positions to stack vertically
+      // Group nodes by their Y level (depth)
+      const layersByY = {};
+      root.descendants().forEach((d) => {
+        const yLevel = d.y;
+        if (!layersByY[yLevel]) layersByY[yLevel] = [];
+        layersByY[yLevel].push(d);
+      });
+      
+      // For each Y level, center nodes with minimal horizontal spread
+      Object.values(layersByY).forEach((nodes) => {
+        if (nodes.length === 1) {
+          // Single node: center it at x=0
+          nodes[0].x = 0;
+        } else {
+          // Multiple nodes: arrange them close together horizontally
+          const spacing = 140; // Spacing between sibling nodes
+          const totalWidth = (nodes.length - 1) * spacing;
+          nodes.forEach((node, i) => {
+            node.x = -totalWidth / 2 + i * spacing;
+          });
+        }
+      });
     }
 
     const duration = 300;
     const nodes = root.descendants();
     const links = root.links();
 
-    // Store old positions before updating
+    // Initialize positions for ALL nodes before any animations
     nodes.forEach(d => {
-      d.x0 = d.x0 || source.x0;
-      d.y0 = d.y0 || source.y0;
+      // If node has never been positioned, set initial position
+      if (d.x0 === undefined || d.y0 === undefined) {
+        if (d.parent && d.parent.x0 !== undefined && d.parent.y0 !== undefined) {
+          // New node starts at parent's last position
+          d.x0 = d.parent.x0;
+          d.y0 = d.parent.y0;
+        } else {
+          // Fallback to source position
+          d.x0 = source.x0 || source.x || 0;
+          d.y0 = source.y0 || source.y || 0;
+        }
+      }
     });
 
     // Update the links (connections between nodes)
     const link = g.selectAll(".link")
       .data(links, d => {
-        // Create unique key for each link
-        return `${d.source.data.name}-${d.target.data.name}`;
+        // Create stable unique key for each link using node IDs
+        return `link-${d.source.id}-${d.target.id}`;
       });
 
     // Enter new links at the parent's previous position
@@ -391,7 +434,11 @@ function renderTree(treeData) {
       .attr("stroke", "#999")
       .attr("stroke-width", 1.5)
       .attr("d", d => {
-        const o = {x: source.x0, y: source.y0};
+        // Start from the parent node's position
+        const o = {
+          x: d.source.x0 !== undefined ? d.source.x0 : source.x0,
+          y: d.source.y0 !== undefined ? d.source.y0 : source.y0
+        };
         return diagonal(o, o, d.target.data.isParent);
       });
 
@@ -406,23 +453,29 @@ function renderTree(treeData) {
       .transition()
       .duration(duration)
       .attr("d", d => {
-        const o = {x: source.x, y: source.y};
+        // Collapse to the source node's new position
+        const o = {
+          x: d.source.x !== undefined ? d.source.x : source.x,
+          y: d.source.y !== undefined ? d.source.y : source.y
+        };
         return diagonal(o, o, d.target.data.isParent);
       })
       .remove();
 
     // Update the nodes
     const node = g.selectAll(".node")
-      .data(nodes, d => {
-        // Create unique key for each node
-        return `${d.data.name}-${d.depth}`;
-      });
+      .data(nodes, d => d.id);
 
     // Enter new nodes at the parent's previous position
     const nodeEnter = node.enter()
       .append("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${source.x0},${source.y0})`)
+      .attr("transform", d => {
+        // Start from parent's position if available
+        const startX = d.parent && d.parent.x0 !== undefined ? d.parent.x0 : source.x0;
+        const startY = d.parent && d.parent.y0 !== undefined ? d.parent.y0 : source.y0;
+        return `translate(${startX},${startY})`;
+      })
       .style("cursor", d => d.data.blocked ? "not-allowed" : "pointer")
       .on("click", (event, d) => {
         if (d.data.blocked) return;
@@ -448,10 +501,17 @@ function renderTree(treeData) {
       .attr("rx", 4)
       .attr("ry", 4)
       .attr("fill", d => {
-        if (d.data.blocked) return "#ffb3b3";
-        return d._children ? "#b3d9ff" : "#ffffff";
+        if (d.data.blocked) return "#FFB3B3";
+        if (d._children) return "#B3D9FF"; // Can expand
+        if (!d.children && !d._children) return "#BEC0C1"; // Leaf node (no children)
+        return "#ffffff"; // Expanded
       })
-      .attr("stroke", d => d.data.blocked ? "#cc0000" : "#666")
+      .attr("stroke", d => {
+        if (d.data.blocked) return "#DA4646";
+        if (d._children) return "#0043B6"; // Can expand
+        if (!d.children && !d._children) return "#707072"; // Leaf node
+        return "#666"; // Expanded
+      })
       .attr("stroke-width", 1);
 
     // Add text label for each node
@@ -474,18 +534,42 @@ function renderTree(treeData) {
     // Update node colors based on collapsed state
     nodeUpdate.select(".node-rect")
       .attr("fill", d => {
-        if (d.data.blocked) return "#ffb3b3";
-        return d._children ? "#b3d9ff" : "#ffffff";
+        if (d.data.blocked) return "#FFB3B3";
+        if (d._children) return "#B3D9FF"; // Can expand
+        if (!d.children && !d._children) return "#BEC0C1"; // Leaf node
+        return "#ffffff"; // Expanded
+      })
+      .attr("stroke", d => {
+        // Check if this is the search target
+        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget) {
+          return "#00cc00";
+        }
+        if (d.data.blocked) return "#DA4646";
+        if (d._children) return "#0043B6"; // Can expand
+        if (!d.children && !d._children) return "#707072"; // Leaf node
+        return "#666"; // Expanded
+      })
+      .attr("stroke-width", d => {
+        // Make search target border thicker
+        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget) {
+          return 3;
+        }
+        return 1;
       });
 
     // Transition exiting nodes to the parent's new position
     node.exit()
       .transition()
       .duration(duration)
-      .attr("transform", d => `translate(${source.x},${source.y})`)
+      .attr("transform", d => {
+        // Collapse to parent's position if available
+        const endX = d.parent && d.parent.x !== undefined ? d.parent.x : source.x;
+        const endY = d.parent && d.parent.y !== undefined ? d.parent.y : source.y;
+        return `translate(${endX},${endY})`;
+      })
       .remove();
 
-    // Store new positions for next transition
+    // Store new positions for next transition (do this immediately, not after animation)
     nodes.forEach(d => {
       d.x0 = d.x;
       d.y0 = d.y;
@@ -528,6 +612,7 @@ function renderTree(treeData) {
   // Reset tree to initial view
   document.getElementById("resetTree").onclick = () => {
     isSearchMode = false;
+    window.currentSearchTarget = null; // Clear search highlight
     const treeData = buildTreeFromJSON(allNodesData);
     renderTree(treeData);
     document.getElementById("resultCount").textContent = "";
@@ -549,7 +634,7 @@ function renderTree(treeData) {
       node.children.forEach((c) => collapseAll(c, level + 1));
     }
     
-    if (level > 2 && node.children) {
+    if (level > 1 && node.children) {
       node._children = node.children;
       node.children = null;
     }
@@ -613,6 +698,9 @@ function renderTree(treeData) {
       return;
     }
     
+    // Store the target name globally for highlighting
+    window.currentSearchTarget = normalizeName(found.name);
+    
     renderTree(subTree);
     
     // Find and highlight the target node after tree is rendered
@@ -648,7 +736,7 @@ function renderTree(treeData) {
             if (normalizeName(d.data.name) === targetName) {
               return "#00cc00";
             }
-            return d.data.blocked ? "#cc0000" : "#666";
+            return d.data.blocked ? "#DA4646" : (d._children ? "#0043B6" : (!d.children && !d._children ? "#707072" : "#666"));
           })
           .attr("stroke-width", (d) => {
             if (normalizeName(d.data.name) === targetName) {

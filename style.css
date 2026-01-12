@@ -94,6 +94,7 @@ input[type="text"] {
 
 .info-item.gray {
   background: #BEC0C1;
+  border-color: #707072;
 }
 
 .info-item.red {

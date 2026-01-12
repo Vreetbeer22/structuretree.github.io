@@ -59,6 +59,13 @@
     ]
   },
   {
+    "name": "D_partScalable = 2",
+    "parents": [
+      "Document Types"
+    ],
+    "children": []
+  },
+  {
     "name": "D_part = 3",
     "parents": [
       "D_folder",
@@ -81,6 +88,7 @@
     "children": [
       "D_folder = 1",
       "D_part = 3",
+      "D_partScalable = 2",
       "D_root = 0"
     ]
   },
@@ -125,12 +133,20 @@
     ]
   },
   {
+    "name": "R_space = 7",
+    "parents": [
+      "Representation Elements"
+    ],
+    "children": []
+  },
+  {
     "name": "Representation Elements",
     "parents": [],
     "children": [
       "R_2Drep = 6",
       "R_Brep = 4",
-      "R_Poly = 5"
+      "R_Poly = 5",
+      "R_space = 7"
     ]
   },
   {
@@ -156,6 +172,20 @@
   },
   {
     "name": "undefined =10",
+    "parents": [
+      "Body Elements"
+    ],
+    "children": []
+  },
+  {
+    "name": "B_spaceDividerLinePoint = 11",
+    "parents": [
+      "Body Elements"
+    ],
+    "children": []
+  },
+  {
+    "name": "B_spaceDivider = 12",
     "parents": [
       "Body Elements"
     ],
@@ -192,6 +222,8 @@
     "children": [
       "B_sheet = 8",
       "B_solid = 9",
+      "B_spaceDivider = 12",
+      "B_spaceDividerLinePoint = 11",
       "shell = 13",
       "undefined =10",
       "wire = 14"
@@ -746,6 +778,7 @@
   {
     "name": "Viewport = 50",
     "parents": [
+      "D_folder",
       "Extra types"
     ],
     "children": []
