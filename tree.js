@@ -362,41 +362,89 @@ function renderTree(treeData) {
     
     // Adjust positions for butterfly layout in search mode
     if (isSearchTreeView) {
-      // First set Y positions (up/down)
-      root.descendants().forEach((d) => {
-        if (d.data.isParent) {
-          // Parents go UP (negative Y)
-          d.y = -Math.abs(d.y);
-        } else if (d.data.isChild) {
-          // Children go DOWN (positive Y)
-          d.y = Math.abs(d.y);
+      // Helper function to calculate the width of a subtree
+      function getSubtreeWidth(node) {
+        if (!node.children || node.children.length === 0) {
+          return 180; // Width for a single node
         }
-        // Target stays at y=0
-      });
+        
+        // Sum up the widths of all children
+        let totalWidth = 0;
+        node.children.forEach(child => {
+          totalWidth += getSubtreeWidth(child);
+        });
+        
+        return Math.max(180, totalWidth);
+      }
       
-      // Then completely override X positions to stack vertically
-      // Group nodes by their Y level (depth)
-      const layersByY = {};
-      root.descendants().forEach((d) => {
-        const yLevel = d.y;
-        if (!layersByY[yLevel]) layersByY[yLevel] = [];
-        layersByY[yLevel].push(d);
-      });
-      
-      // For each Y level, center nodes with minimal horizontal spread
-      Object.values(layersByY).forEach((nodes) => {
-        if (nodes.length === 1) {
-          // Single node: center it at x=0
-          nodes[0].x = 0;
-        } else {
-          // Multiple nodes: arrange them close together horizontally
-          const spacing = 140; // Spacing between sibling nodes
-          const totalWidth = (nodes.length - 1) * spacing;
-          nodes.forEach((node, i) => {
-            node.x = -totalWidth / 2 + i * spacing;
-          });
+      // Helper function to position nodes in a subtree
+      function positionSubtree(node, startX, isUpward) {
+        if (!node.children || node.children.length === 0) {
+          node.x = startX;
+          node.y = isUpward ? -Math.abs(node.y) : Math.abs(node.y);
+          return 180;
         }
-      });
+        
+        // Calculate widths for each child
+        const childWidths = node.children.map(child => getSubtreeWidth(child));
+        const totalWidth = childWidths.reduce((sum, w) => sum + w, 0);
+        
+        // Position children from left to right
+        let currentX = startX;
+        node.children.forEach((child, i) => {
+          const childWidth = childWidths[i];
+          const childCenterX = currentX + childWidth / 2;
+          
+          positionSubtree(child, currentX, isUpward);
+          child.x = childCenterX;
+          child.y = isUpward ? -Math.abs(child.y) : Math.abs(child.y);
+          
+          currentX += childWidth;
+        });
+        
+        // Center the parent over its children
+        node.x = startX + totalWidth / 2;
+        node.y = isUpward ? -Math.abs(node.y) : Math.abs(node.y);
+        
+        return totalWidth;
+      }
+      
+      // Separate parent branches from child branches at root level
+      const rootChildren = root.children || [];
+      const parentBranches = rootChildren.filter(c => c.data.isParent);
+      const childBranches = rootChildren.filter(c => c.data.isChild);
+      
+      // Calculate widths for parent and child branches
+      const parentWidths = parentBranches.map(p => getSubtreeWidth(p));
+      const childWidths = childBranches.map(c => getSubtreeWidth(c));
+      const totalParentWidth = parentWidths.reduce((sum, w) => sum + w, 0);
+      const totalChildWidth = childWidths.reduce((sum, w) => sum + w, 0);
+      
+      // Center the root
+      root.x = 0;
+      root.y = 0;
+      
+      // Position parent branches (going UP)
+      if (parentBranches.length > 0) {
+        let currentX = -totalParentWidth / 2;
+        parentBranches.forEach((parent, i) => {
+          positionSubtree(parent, currentX, true);
+          parent.x = currentX + parentWidths[i] / 2;
+          parent.y = -Math.abs(parent.y);
+          currentX += parentWidths[i];
+        });
+      }
+      
+      // Position child branches (going DOWN)
+      if (childBranches.length > 0) {
+        let currentX = -totalChildWidth / 2;
+        childBranches.forEach((child, i) => {
+          positionSubtree(child, currentX, false);
+          child.x = currentX + childWidths[i] / 2;
+          child.y = Math.abs(child.y);
+          currentX += childWidths[i];
+        });
+      }
     }
 
     const duration = 300;
@@ -540,8 +588,8 @@ function renderTree(treeData) {
         return "#ffffff"; // Expanded
       })
       .attr("stroke", d => {
-        // Check if this is the search target
-        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget) {
+        // Check if this is the search target (must be the root node with isTarget flag)
+        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget && d.data.isTarget) {
           return "#00cc00";
         }
         if (d.data.blocked) return "#DA4646";
@@ -550,8 +598,8 @@ function renderTree(treeData) {
         return "#666"; // Expanded
       })
       .attr("stroke-width", d => {
-        // Make search target border thicker
-        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget) {
+        // Make search target border thicker (only for the root target node)
+        if (window.currentSearchTarget && normalizeName(d.data.name) === window.currentSearchTarget && d.data.isTarget) {
           return 3;
         }
         return 1;
@@ -604,7 +652,10 @@ function renderTree(treeData) {
   
   // Collapse all nodes button
   document.getElementById("collapseAll").onclick = () => {
-    collapseAll(root, 0);
+    // In search mode, collapse everything (only show root)
+    // In normal mode, keep 2 levels visible (root + first children)
+    const maxLevel = isSearchTreeView ? 0 : 1;
+    collapseAll(root, 0, maxLevel);
     update(root);
     centerTree();
   };
@@ -629,12 +680,12 @@ function renderTree(treeData) {
   }
 
   // Recursively collapse nodes beyond a certain level
-  function collapseAll(node, level = 0) {
+  function collapseAll(node, level = 0, maxLevel = 1) {
     if (node.children) {
-      node.children.forEach((c) => collapseAll(c, level + 1));
+      node.children.forEach((c) => collapseAll(c, level + 1, maxLevel));
     }
     
-    if (level > 1 && node.children) {
+    if (level > maxLevel && node.children) {
       node._children = node.children;
       node.children = null;
     }
@@ -733,13 +784,13 @@ function renderTree(treeData) {
         // Highlight the target node with green border
         g.selectAll(".node-rect")
           .attr("stroke", (d) => {
-            if (normalizeName(d.data.name) === targetName) {
+            if (normalizeName(d.data.name) === targetName && d.data.isTarget) {
               return "#00cc00";
             }
             return d.data.blocked ? "#DA4646" : (d._children ? "#0043B6" : (!d.children && !d._children ? "#707072" : "#666"));
           })
           .attr("stroke-width", (d) => {
-            if (normalizeName(d.data.name) === targetName) {
+            if (normalizeName(d.data.name) === targetName && d.data.isTarget) {
               return 3;
             }
             return 1;
